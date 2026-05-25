@@ -273,7 +273,7 @@ st.markdown("""
 @st.cache_resource
 def load_models():
     scaler = joblib.load(r'C:\Users\HP\OneDrive\Desktop\DataScience\Data Science\Fraud_Detection_System\standard_scaler.joblib')
-    model  = joblib.load(r'C:\Users\HP\OneDrive\Desktop\DataScience\Data Science\Fraud_Detection_System\xgboost_fraud_detection_model.joblib')
+    model = joblib.load(r'C:\Users\HP\OneDrive\Desktop\DataScience\Data Science\Fraud_Detection_System\xgboost_fraud_detection_model.joblib')
     return scaler, model
 
 scaler, model = load_models()
