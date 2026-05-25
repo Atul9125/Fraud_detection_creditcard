@@ -7,6 +7,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import time
 import warnings
+import os
 warnings.filterwarnings("ignore")
 
 # ─── PAGE CONFIG ──────────────────────────────────────────────────────────────
@@ -272,8 +273,9 @@ st.markdown("""
 # ─── LOAD MODELS ──────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_models():
-    scaler = joblib.load(r'C:\Users\HP\OneDrive\Desktop\DataScience\Data Science\Fraud_Detection_System\standard_scaler.joblib')
-    model = joblib.load(r'C:\Users\HP\OneDrive\Desktop\DataScience\Data Science\Fraud_Detection_System\xgboost_fraud_detection_model.joblib')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    scaler = joblib.load(os.path.join(BASE_DIR, 'standard_scaler.joblib'))
+    model = joblib.load(os.path.join(BASE_DIR, 'xgboost_fraud_detection_model.joblib'))
     return scaler, model
 
 scaler, model = load_models()
