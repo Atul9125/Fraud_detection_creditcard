@@ -23,7 +23,7 @@ app = FastAPI(
 # ============================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 scaler = joblib.load(os.path.join(BASE_DIR, 'standard_scaler.joblib'))
-model = joblib.load(os.path.join(BASE_DIR, 'xgboost_fraud_detection_model.joblib'))
+model = joblib.load(os.path.join(BASE_DIR, 'xgboost_smote_fraud_detection_model.joblib'))
 
 # ============================================
 # Input Schema Define Karo
@@ -84,6 +84,7 @@ def model_info():
 @app.post("/predict")
 def predict(data: TransactionData):
     try:
+
         # Step 1 — Features validate karo
         if len(data.features) != 30:
             raise HTTPException(
@@ -91,21 +92,31 @@ def predict(data: TransactionData):
                 detail=f"30 features chahiye, aapne {len(data.features)} diye"
             )
 
-        # Step 2 — Numpy array banao
-        input_data = np.array(data.features).reshape(1, -1)
+        # Step 2 — Features copy karo
+        features = data.features.copy()
 
-        # Step 3 — Scale karo
-        input_scaled = scaler.transform(input_data)
+        # Step 3 — Sirf Amount scale karo
+        # Amount last feature hai
+        amount = np.array([[features[-1]]])
 
-        # Step 4 — Prediction karo
-        prediction = model.predict(input_scaled)[0]
+        scaled_amount = scaler.transform(amount)[0][0]
 
-        # Step 5 — Risk Score nikalo
-        probability = model.predict_proba(input_scaled)[0]
+        # Replace original amount
+        features[-1] = scaled_amount
+
+        # Step 4 — Final input banao
+        input_data = np.array(features).reshape(1, -1)
+
+        # Step 5 — Prediction karo
+        prediction = model.predict(input_data)[0]
+
+        # Step 6 — Probability nikalo
+        probability = model.predict_proba(input_data)[0]
+
         fraud_risk = round(probability[1] * 100, 2)
         safe_score = round(probability[0] * 100, 2)
 
-        # Step 6 — Result taiyar karo
+        # Step 7 — Final Result
         if prediction == 1:
             result = "Fraud"
             alert = "ALERT! Suspicious Transaction Detected!"
@@ -113,7 +124,7 @@ def predict(data: TransactionData):
             result = "Safe"
             alert = "Transaction is Safe"
 
-        # Step 7 — Response bhejo
+        # Step 8 — Response
         return {
             "prediction": result,
             "fraud_risk_score": f"{fraud_risk}%",
@@ -123,8 +134,12 @@ def predict(data: TransactionData):
 
     except HTTPException as e:
         raise e
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 # ============================================
 # App Run Karo
