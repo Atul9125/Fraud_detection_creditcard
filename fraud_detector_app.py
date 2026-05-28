@@ -275,7 +275,7 @@ st.markdown("""
 def load_models():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     scaler = joblib.load(os.path.join(BASE_DIR, 'standard_scaler.joblib'))
-    model = joblib.load(os.path.join(BASE_DIR, 'xgboost_fraud_detection_model.joblib'))
+    model = joblib.load(os.path.join(BASE_DIR, 'xgboost_smote_fraud_detection_model.joblib'))
     return scaler, model
 
 scaler, model = load_models()
@@ -788,3 +788,6 @@ st.markdown("""
   FraudGuard AI &nbsp;·&nbsp; XGBoost + Standard Scaler Pipeline &nbsp;·&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
+
+
+# https://frauddetectioncreditcard-2ofh7jbsyclueimgnezifx.streamlit.app/
